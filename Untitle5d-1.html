@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: "Comic Sans MS", "Chalkboard SE", "Comic Neue", sans-serif;
+            background: radial-gradient(circle, rgb(22, 9, 37) 0%, rgb(30, 34, 70) 100%);
+            color: white;
+        }
+        .cell {
+            width: 75px;
+            height: 75px;
+            border-radius: 5px;
+            border: 3px solid black;
+            display: inline-block;
+            font-size: 36px;
+            text-align: center;
+            line-height: 75px;
+            background: linear-gradient(to bottom, #091927, #2c0932);
+        }
+        .red {
+            background: linear-gradient(to bottom, #c01818, #6b0000);            
+        }
+        .yellow {
+            background: linear-gradient(to bottom, #ffaa00, #ffd015);
+        }
+        .green {
+            background: linear-gradient(to bottom, #22ff00, #396b00);
+        }
+        .overlay {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 9998;
+            pointer-events: none;
+            animation: whiteFlash 0.8s ease-in-out forwards;
+        }
+        #firststring, #secondstring, #thirdstring, #fourthstring, #fifthstring, #sixthstring {
+            display: grid;
+            margin-bottom: 15px;
+            grid-template-columns: repeat(5, 86px);
+        }
+        .hidden {
+            display: none;
+        }
+        .overlayend {
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #028dff, #6f03e9);
+            z-index: 9999;
+        }
+        .buttonrestart {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 2px solid orange;
+            border-radius: 25px;
+            background: linear-gradient(to bottom, #ffbb00, #ffe600);
+            aspect-ratio: 4 / 3;
+            width: 25%;
+            font-size: clamp(12px, 5vw, 56px);
+            font-family: "Comic Sans MS", "Chalkboard SE", "Comic Neue", sans-serif;
+            color: white;
+        }
+        @keyframes pulse {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                transform: translateX(-50%) scale(0.85); 
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+        .buttonrestart:active {
+            animation: pulse 0.2s ease-in-out;
+        }
+        @keyframes whiteFlash {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        #winspan {
+            position: absolute;
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(6px, 36px, 48px); color: white;
+            text-align: center;
+            white-space: nowrap;
+        }
+        #randomwordspan {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(4px, 24px, 32px); color:
+            white; 
+            text-align: center;
+            white-space: nowrap;
+        }
+        h1 {
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%);
+        }
+        #megacells {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @media (max-width: 375px) {
+            .cell {
+                width: 50px;
+                height: 50px;
+                display: inline-block;
+                font-size: 24px;
+                line-height: 50px;
+            }
+            #firststring, #secondstring, #thirdstring, #fourthstring, #fifthstring, #sixthstring {
+                display: grid;
+                margin-bottom: 5px;
+                grid-template-columns: repeat(5, 56px);
+            }
+            #winspan {
+                font-size: 24px
+            }
+            #randomwordspan {
+                font-size: 16px
+            }
+        }
+        @media (max-width: 428px) {
+            .cell {
+                width: 65px;
+                height: 65px;
+                display: inline-block;
+                font-size: 32px;
+                line-height: 65px;
+            }
+            #firststring, #secondstring, #thirdstring, #fourthstring, #fifthstring, #sixthstring {
+                display: grid;
+                margin-bottom: 5px;
+                grid-template-columns: repeat(5, 66px);
+            }
+            #winspan {
+                font-size: 24px
+            }
+            #randomwordspan {
+                font-size: 16px
+            }
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div>
+            <div>
+                <h1>Wordle</h1>
+                <div id="megacells">
+                    <div id="firststring">
+                    <div class="cell" id="cell11"> </div>
+                    <div class="cell" id="cell12"> </div>
+                    <div class="cell" id="cell13"> </div>
+                    <div class="cell" id="cell14"> </div>
+                    <div class="cell" id="cell15"> </div>
+                    </div>
+                    <div id="secondstring">
+                    <div class="cell" id="cell21"> </div>
+                    <div class="cell" id="cell22"> </div>
+                    <div class="cell" id="cell23"> </div>
+                    <div class="cell" id="cell24"> </div>
+                    <div class="cell" id="cell25"> </div>
+                    </div>
+                    <div id="thirdstring">
+                    <div class="cell" id="cell31"> </div>
+                    <div class="cell" id="cell32"> </div>
+                    <div class="cell" id="cell33"> </div>
+                    <div class="cell" id="cell34"> </div>
+                    <div class="cell" id="cell35"> </div>
+                    </div>
+                    <div id="fourthstring">
+                    <div class="cell" id="cell41"> </div>
+                    <div class="cell" id="cell42"> </div>
+                    <div class="cell" id="cell43"> </div>
+                    <div class="cell" id="cell44"> </div>
+                    <div class="cell" id="cell45"> </div>
+                    </div>
+                    <div id="fifthstring">
+                    <div class="cell" id="cell51"> </div>
+                    <div class="cell" id="cell52"> </div>
+                    <div class="cell" id="cell53"> </div>
+                    <div class="cell" id="cell54"> </div>
+                    <div class="cell" id="cell55"> </div>
+                    </div>
+                    <div id="sixthstring">
+                    <div class="cell" id="cell61"> </div>
+                    <div class="cell" id="cell62"> </div>
+                    <div class="cell" id="cell63"> </div>
+                    <div class="cell" id="cell64"> </div>
+                    <div class="cell" id="cell65"> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    const result = Array(5).fill("Wrong");
+    const wordList = [
+        "АКТЁР", "АЛМАЗ", "АМБАР", "АНГАР", "АРБУЗ", "АРЕНА", "АТЛАС", "АУДИО",
+        "БАГАЖ", "БАЗАР", "БАЛЕТ", "БАНКА", "БАРАН", "БАРЖА", "БАСНЯ", "БАТОН",
+        "БЕЛОК", "БЕТОН", "БИЛЕТ", "БИСЕР", "БЛАГО", "БЛЕСК", "БЛЮДО", "БОБЁР",
+        "БОКАЛ", "БОЧКА", "БРОВЬ", "БРЮКИ", "БУБЕН", "БУДКА", "БУКВА", "ВАГОН",
+        "ВАЛИК", "ВАННА", "ВЕНЕЦ", "ВЕТЕР", "ВЕТКА", "ВЕЧЕР", "ВЗЛЁТ", "ВИДЕО",
+        "ВИЛКА", "ВИШНЯ", "ВКЛАД", "ВОЖДЬ", "ВОЛНА", "ВОЛОС", "ВОРОН", "ВРЕМЯ",
+        "ВЫХОД", "ГАЙКА", "ГАРАЖ", "ГЕНИЙ", "ГИДРА", "ГЛАЗА", "ГЛИНА", "ГОЛОС",
+        "ГОРОД", "ГОРОХ", "ГРИВА", "ГРОЗА", "ГРЯЗЬ", "ГУДОК", "ДВЕРЬ", "ДИВАН",
+        "ДИЛЕР", "ДОЖДЬ", "ДОСКА", "ДРАМА", "ДРОВА", "ДУБЛЬ", "ДЫМОК", "ЕГЕРЬ",
+        "ЕСАУЛ", "ЖАЖДА", "ЖИЛЬЁ", "ЖИРАФ", "ЗАБОР", "ЗАВОД", "ЗАКАЗ", "ЗАПАС",
+        "ЗАПАД", "ЗВЕРЬ", "ЗЕРНО", "ЗНАМЯ", "ЗУБИК", "ИКОНА", "ИМЕНА", "ИСКРА",
+        "ИТОГО", "КАКАО", "КАНАЛ", "КАПЛЯ", "КАРТА", "КАСКА", "КАТЕР", "КВАРТ",
+        "КЕФИР", "КИОСК", "КНИГА", "КОВЁР", "КОЗЁЛ", "КОКОС", "КОПЁР", "КОРКА",
+        "КОТЁЛ", "КРОВЬ", "КРЫЛО", "КУБИК", "КУКЛА", "КУЛЁК", "КУЛАК", "ЛАМПА",
+        "ЛЕНТА", "ЛЁТКА", "ЛИМОН", "ЛОДКА", "ЛОЖКА", "ЛОПУХ", "ЛЫЖНЯ", "МАРКА",
+        "МАСКА", "МАСЛО", "МЕДОК", "МЕТРО", "МИРОН", "МИСКА", "МОРОЗ", "МУЗЕЙ",
+        "МЫШКА", "НАВЕС", "НАЛОГ", "НАРОД", "НИТКА", "НОВАЯ", "НОЖИК", "НОМЕР",
+        "НОСОК", "ОБЗОР", "ОКЕАН", "ОЛЕНЬ", "ОПЕРА", "ОРДЕН", "ОСЕНЬ", "ОТВЕТ",
+        "ОТДЕЛ", "ОХОТА", "ПАЛКА", "ПАРАД", "ПАРУС", "ПЕВЕЦ", "ПЕНАЛ", "ПЕНЁК",
+        "ПЕРЕЦ", "ПЕСОК", "ПЕСНЯ", "ПИЛОТ", "ПИРОГ", "ПИТОН", "ПЛЕМЯ", "ПЛИТА",
+        "ПОВАР", "ПОЕЗД", "ПОЖАР", "ПОЛКА", "ПОРОГ", "ПОТОК", "ПОЧТА", "ПРАВО",
+        "ПРЕСС", "ПРИЮТ", "ПТИЦА", "ПУДРА", "ПУЛЬТ", "ПЬЕСА", "РАДИО",
+        "РАЗУМ", "РАЛЛИ", "РАМКА", "РАНЦЫ", "РЕБРО", "РЕЖИМ", "РЕЧКА", "РОБОТ",
+        "РОЛИК", "РОМАН", "РОТОР", "РУКАВ", "РУЖЬЁ", "РУЧКА", "РЫНОК", "САЛАТ",
+        "САЛОН", "САХАР", "СВЕЧА", "СВЗЬ", "СЕВЕР", "СЕДЛО", "СЕМЬЯ", "СЕНОК",
+        "СЕТКА", "СИРОП", "СКЛАД", "СКРИП", "СЛИВА", "СЛОВО", "СМЕНА", "СМОЛА",
+        "СМЫСЛ", "СОБОР", "СОВЕТ", "СОКОЛ", "СОРОК", "СОСНА", "СОСУД", "СПОРТ",
+        "СРЕДА", "СТАЛЬ", "СТЕНА", "СТИЛЬ", "СТИХИ", "СТОЛБ", "СУДЬЯ", "СУМКА",
+        "СХЕМА", "СЦЕНА", "СЪЕЗД", "ТАЙНА", "ТАКСИ", "ТАЛИЯ", "ТАНЕЦ", "ТАПОК",
+        "ТАРИФ", "ТЕАТР", "ТЁЗКА", "ТЕКСТ", "ТЕМНО", "ТЁРКА", "ТИРАЖ", "ТИТУЛ",
+        "ТКАНЬ", "ТОВАР", "ТОМАТ", "ТОННА", "ТОПОР", "ТОЧКА", "ТРАВА", "ТРАКТ",
+        "ТРИКО", "ТРОПА", "ТРУБА", "ТУМАН", "ТУФЛЯ", "ТЫКВА", "УГОЛЬ", "УКРОП",
+        "УЛИЦА", "УМНИК", "УПРЁК", "УСПЕХ", "ФАКЕЛ", "ФАСАД", "ФАЗАН", "ФЁДОР",
+        "ФЁКЛА", "ФЕРМА", "ФИЛИН", "ФИЛЬМ", "ФИНИШ", "ФИРМА", "ФЛАНГ", "ФОКУС",
+        "ФОРМА", "ФОРУМ", "ФРУКТ", "ХАЛАТ", "ХВОСТ", "ХИМИЯ", "ХИТРО", "ХМЫРЬ",
+        "ХОЛОД", "ХОХЁЛ", "ЦЕЛЕЕ", "ЦЕНТР", "ЦИФРА", "ЦЫГАН", "ЧАЙКА", "ЧАШКА",
+        "ЧЁЛКА", "ЧЕРВЬ", "ЧЕРЕП", "ЧИЖИК", "ЧИСЛО", "ЧОКЕР", "ЧУЛОК", "ШАЙБА",
+        "ШАЛАШ", "ШАПКА", "ШАХТА", "ШКУРА", "ШКОЛА", "ШЛАНГ", "ШЛЯПА", "ШОФЁР",
+        "ШПИОН", "ШРИФТ", "ШТОРМ", "ШТУКА", "ШУТКА", "ЩЁЛКА", "ЩЕПКА", "ЩИТОК",
+        "ЭКРАН", "ЭЛАСТ", "ЭМАЛЬ", "ЭПОХА", "ЮНОША", "ЮРИСТ", "ЯГОДА", "ЯКОРЬ"
+    ];
+    let randomWord = wordList[Math.floor(Math.random() * wordList.length)];
+    
+    const firststring = document.getElementById('firststring');
+    const secondstring = document.getElementById('secondstring');
+    const thirdstring = document.getElementById('thirdstring');
+    const fourthstring = document.getElementById('fourthstring');
+    const fifthstring = document.getElementById('fifthstring');
+    const sixthstring = document.getElementById('sixthstring');
+    const cellsList = [
+        firststring.querySelectorAll('.cell'),
+        secondstring.querySelectorAll('.cell'),
+        thirdstring.querySelectorAll('.cell'),
+        fourthstring.querySelectorAll('.cell'),
+        fifthstring.querySelectorAll('.cell'),
+        sixthstring.querySelectorAll('.cell')
+    ];
+    
+    const overlay = document.createElement('div');
+    const buttonrestart = document.createElement("button");
+    document.body.appendChild(overlay);
+    overlay.appendChild(buttonrestart);
+    overlay.classList.add('hidden');
+    buttonrestart.classList.add('hidden');
+    buttonrestart.innerText = "Рестарт";
+    
+    let currentGuess = "";
+    let currentString = 0;
+    let checked = true;
+    let gameisrunning = true;
+    let winspan = null;
+    let randomwordspan = null;
+    
+    let renderBoard = (string) => {
+        string.forEach((cell, idx) => {
+            cell.innerText = currentGuess[idx] || '';
+        });
+    };
+    
+    const endgame = (isWin) => {
+        gameisrunning = false;
+        checked = false;
+        overlay.classList.remove("hidden");
+        overlay.classList.add("overlayend");
+        buttonrestart.classList.remove("hidden");
+        buttonrestart.classList.add("buttonrestart");
+        
+        winspan = document.createElement("span");
+        randomwordspan = document.createElement("span");
+        overlay.appendChild(winspan);
+        overlay.appendChild(randomwordspan);
+        randomwordspan.id = "randomwordspan";
+        winspan.id = "winspan";
+        
+        
+        
+        if (isWin) {
+            winspan.innerText = "ВЫ ПОБЕДИЛИ! 🎉";
+        } else {
+            winspan.innerText = "ВЫ ПРОИГРАЛИ 😔";
+        }
+        randomwordspan.innerText = `Загаданное слово: ${randomWord}`;
+    };
+    
+    buttonrestart.addEventListener("click", function() {
+        currentGuess = "";
+        currentString = 0;
+        checked = true;
+        gameisrunning = true;
+        randomWord = wordList[Math.floor(Math.random() * wordList.length)];
+        
+        if (winspan) winspan.remove();
+        if (randomwordspan) randomwordspan.remove();
+        
+        cellsList.forEach(row => {
+            row.forEach(cell => {
+                cell.innerText = "";
+                cell.classList.remove('red', 'green', 'yellow');
+            });
+        });
+        
+        overlay.classList.add("hidden");
+        overlay.classList.remove("overlayend");
+        buttonrestart.classList.add("hidden");
+        
+        const secondOverlay = document.createElement("div");
+        secondOverlay.classList.add('overlay');
+        document.body.appendChild(secondOverlay);
+        setTimeout(() => {
+            secondOverlay.remove();
+        }, 800);
+    });
+    
+    const checkString = (cells) => {
+        const result = Array(5).fill("Wrong"); 
+        const secretwordchars = randomWord.split("");
+        const guesswordchars = currentGuess.split("");
+        
+        guesswordchars.forEach((leter, i) => {
+            if (leter === secretwordchars[i]) {
+                result[i] = "correct";
+                secretwordchars[i] = null;
+                guesswordchars[i] = null;
+            }
+        });
+        guesswordchars.forEach((leter, i) => {
+            if (leter !== null) {
+                const indexInRandomWord = secretwordchars.indexOf(leter);
+                if (indexInRandomWord !== -1) {
+                    result[i] = "missplaced";
+                    secretwordchars[indexInRandomWord] = null;
+                }
+            }
+        });
+        cells.forEach((cell, idx) => {
+            switch (result[idx]) {
+                case "Wrong":
+                    cell.classList.add("red")
+                    break;
+                case "missplaced":
+                    cell.classList.add("yellow")
+                    break;
+                case "correct":
+                    cell.classList.add("green")
+                    break;
+            }
+        });
+        
+
+        if (currentGuess === randomWord) {
+            endgame(true);
+            return true;
+        }
+        return false;
+    };
+    
+    window.addEventListener("keydown", function(event) {
+        if (!checked || !gameisrunning) {
+            event.preventDefault();
+            return;
+        }
+        
+        const key = event.key;
+        if (key === "Backspace") {
+            currentGuess = currentGuess.slice(0, -1);
+            renderBoard(cellsList[currentString]);
+            event.preventDefault();
+            return;
+        }
+        
+        if (key === "Enter") {
+            if (currentGuess.length !== 5) {
+                event.preventDefault();
+                return;
+            }
+            const isWin = checkString(cellsList[currentString]);
+            if (isWin) {
+                event.preventDefault();
+                return;
+            }
+            if (currentString < 5) {
+                currentString += 1;
+                currentGuess = "";
+                renderBoard(cellsList[currentString]);
+            } else {
+                endgame(false);
+            }
+            event.preventDefault();
+            return;
+        }
+        
+        const isLetter = /^[а-яА-ЯёЁ]$/u.test(key);
+        if (isLetter && currentGuess.length < 5) {
+            currentGuess += key.toUpperCase();
+            renderBoard(cellsList[currentString]);
+            event.preventDefault();
+        }
+    });
+    
+    renderBoard(cellsList[0]);
+</script>
+</body>
+</html>
+    
